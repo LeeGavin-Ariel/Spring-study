@@ -30,6 +30,9 @@ public class SecurityConfig {
         ).formLogin((formLogin) ->
         		formLogin
         				.loginPage("/loginForm")
+        				.loginProcessingUrl("/login") // /login 주소가 호출되면 security가 낚아채서 로그인을 진행해준다.
+        				.defaultSuccessUrl("/") // 로그인이 되면 메인페이지로 가도록
+        				// .usernameParameter("userId") // loginForm에서 username이 아닌 다른 이름으로 받고 싶은 경우
 		);
 
         return http.build();

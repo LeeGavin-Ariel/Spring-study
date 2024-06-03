@@ -53,7 +53,7 @@ public class IndexController {
 	
 	@PostMapping("/join")
 	public String join(User user) {
-		user.setRole("USER");
+		user.setRole("ROLE_USER");
 		user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
 		userRepository.save(user);
 
