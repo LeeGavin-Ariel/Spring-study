@@ -1,6 +1,8 @@
 package com.study.securitypjt.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -63,5 +65,17 @@ public class IndexController {
 	@GetMapping("/joinForm")
 	public String joinForm() {
 		return "joinForm";
+	}
+	
+	@Secured("ROLE_ADMIN") // 해당 권한만 접근 가능 
+	@GetMapping("/info")
+	public String info() {
+		return "info";
+	}
+	
+	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_MANAGER')")
+	@GetMapping("/data")
+	public String data() {
+		return "data";
 	}
 }

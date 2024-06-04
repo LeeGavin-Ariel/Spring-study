@@ -2,6 +2,7 @@ package com.study.securitypjt.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
@@ -10,6 +11,7 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity // 스프링 시큐리티 필터가 스프링 필터체인에 등록이 됨(활성화)
+@EnableMethodSecurity(securedEnabled = true, prePostEnabled = true) // secured, preAuthorize 어노테이션 활성화 
 public class SecurityConfig {
 	
 	// 해당 메서드의 리턴되는 오브젝트를 IoC로 등록해준다.
@@ -24,7 +26,7 @@ public class SecurityConfig {
         http.authorizeHttpRequests(authorize ->
                 authorize
                         .requestMatchers("/user/**").authenticated()
-                        .requestMatchers("/manager/**").hasAnyRole("ADMIN", "MANAGER")
+                        .requestMatchers("/manager/**").hasAnyRole("ADMIN", "MANAGER") // DB저장은 ROLE_* 여야 한다.
                         .requestMatchers("/admin/**").hasAnyRole("ADMIN")
                         .anyRequest().permitAll()
         ).formLogin((formLogin) ->
