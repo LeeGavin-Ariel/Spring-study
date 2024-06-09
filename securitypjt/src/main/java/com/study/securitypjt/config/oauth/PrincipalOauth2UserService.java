@@ -1,5 +1,7 @@
 package com.study.securitypjt.config.oauth;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -9,6 +11,9 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import com.study.securitypjt.config.auth.PrincipalDetails;
+import com.study.securitypjt.config.oauth.provider.GoogleUserInfo;
+import com.study.securitypjt.config.oauth.provider.NaverUserInfo;
+import com.study.securitypjt.config.oauth.provider.OAuth2UserInfo;
 import com.study.securitypjt.domain.User;
 import com.study.securitypjt.repository.UserRepository;
 
@@ -36,13 +41,22 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService{
 		// provider = google
 		// providerId = {sub}
 		
-		OAuth2User oauth2User = super.loadUser(userRequest);
-
-		String provider = userRequest.getClientRegistration().getClientId();
-		String providerId = oauth2User.getAttribute("sub");
+		OAuth2User oauth2User = super.loadUser(userRequest); //super.loadUser(userRequest);
+		
+		OAuth2UserInfo oauth2UserInfo = null;
+		
+		if(userRequest.getClientRegistration().getRegistrationId().equals("google")) {
+			System.out.println("google");
+			oauth2UserInfo = new GoogleUserInfo(oauth2User.getAttributes());
+		} else if (userRequest.getClientRegistration().getRegistrationId().equals("naver")) {
+			System.out.println("naver");
+			oauth2UserInfo = new NaverUserInfo((Map) oauth2User.getAttributes().get("response"));
+		}
+		String provider = oauth2UserInfo.getProvider();
+		String providerId = oauth2UserInfo.getProviderId();
 		String username = provider+"_"+providerId;
 		String password = bCryptPasswordEncoder.encode("겟인데어");
-		String email = oauth2User.getAttribute("email");		
+		String email = oauth2UserInfo.getEmail();		
 		String role = "ROLE_USER";
 		
 		User userEntity = userRepository.findByUsername(username);
