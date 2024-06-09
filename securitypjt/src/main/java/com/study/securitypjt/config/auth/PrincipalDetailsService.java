@@ -1,4 +1,4 @@
-package com.study.securitypjt.auth;
+package com.study.securitypjt.config.auth;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;

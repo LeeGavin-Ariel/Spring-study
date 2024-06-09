@@ -3,11 +3,16 @@ package com.study.securitypjt.Controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.study.securitypjt.config.auth.PrincipalDetails;
 import com.study.securitypjt.domain.User;
 import com.study.securitypjt.repository.UserRepository;
 
@@ -20,6 +25,30 @@ public class IndexController {
 	@Autowired
 	BCryptPasswordEncoder bCryptPasswordEncoder;
 	
+	@GetMapping("/test/login")
+	public @ResponseBody String testLogin(Authentication authentication, 
+			@AuthenticationPrincipal PrincipalDetails userDetails) {
+		// principalDetails 가 userDetails 상속받는다.
+		// 일반적으로  UserDetails 타입이 Authentication에 들어온다.
+		PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
+		System.out.println("authentication : " + principalDetails.getUser());
+
+		System.out.println("userDetails : " + userDetails.getUser());
+
+		return "세션 정보 확인하기";
+	}
+	
+	@GetMapping("/test/oauth/login")
+	public @ResponseBody String testOAuthLogin(Authentication authentication,
+			@AuthenticationPrincipal OAuth2User oauth) { // 타입은 다르지만 접근 가능 방법 2가지
+		// OAuth 로그인을 하면 OAuth2User 타입이 Authentication에 들어온다.
+		// userDetails, principalDetails 같은 타입
+		OAuth2User oauth2User = (OAuth2User) authentication.getPrincipal();
+		System.out.println("userDetails : " + oauth2User.getAttributes());
+		System.out.println("oauth2User : "+oauth.getAttributes());
+		return "OAuth 세션 정보 확인하기";
+	}
+	
 	@GetMapping({"", "/"})
 	public String index() {
 		// 머스테치 기본 폴더 : src/main/resources/
@@ -27,8 +56,10 @@ public class IndexController {
 		return "index";
 	}
 	
+	// Authentication 객체에 PrincipalDetails를 저장하기 위해서 Service를 만들었
 	@GetMapping("/user")
-	public String user() {
+	public String user(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+		System.out.println("principalDetails : "+principalDetails.getUser());
 		return "user";
 	}
 	
